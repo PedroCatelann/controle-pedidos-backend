@@ -4,6 +4,7 @@ import com.pedrocatelan.form.dtos.FuncionarioDTO;
 import com.pedrocatelan.form.entities.Funcionario;
 import com.pedrocatelan.form.services.FuncionarioService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,8 +62,8 @@ public class FuncionarioController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping()
-    public ResponseEntity<List<FuncionarioDTO>> listarFuncionarios() {
+    @GetMapping("/listar")
+    public ResponseEntity<List<FuncionarioDTO>> listarFuncionarios(@PathParam("nome") String nome) {
         var funcionarios = funcionarioService.listarFuncionarios();
 
         return ResponseEntity.ok(funcionarios);
