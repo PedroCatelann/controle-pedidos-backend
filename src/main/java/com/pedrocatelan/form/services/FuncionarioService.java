@@ -30,9 +30,9 @@ public class FuncionarioService {
     public Funcionario alterarEntregador(Funcionario funcionario) {
         if(funcionario == null) throw new RequiredObjectIsNullException();
 
-        var entity = funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado!"));
+        funcionarioRepository.findById(funcionario.getId()).orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado!"));
+        return funcionarioRepository.save(funcionario);
 
-        return funcionarioRepository.save(entity);
     }
 
     public Optional<Funcionario> getById(BigInteger id) {
@@ -44,11 +44,11 @@ public class FuncionarioService {
         funcionarioRepository.delete(funcionario);
     }
 
-    public List<FuncionarioDTO> listarFuncionarios() {
-        var funcionarios = funcionarioRepository.findAll();
+    public List<FuncionarioDTO> listarFuncionarios(String nome) {
+        var funcionarios = funcionarioRepository.findByNomeContainingIgnoreCaseOptional(nome);
 
         return funcionarios.stream()
-                .map(func -> FuncionarioDTO.builder().nome(func.getNome()).roles(func.getRoles()).build())
+                .map(func -> FuncionarioDTO.builder().id(func.getId()).nome(func.getNome()).roles(func.getRoles()).build())
                 .toList();
     }
 }

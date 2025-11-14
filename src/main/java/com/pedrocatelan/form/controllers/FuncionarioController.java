@@ -55,6 +55,7 @@ public class FuncionarioController {
     @PutMapping()
     public ResponseEntity<FuncionarioDTO> obterFuncionario(@RequestBody FuncionarioDTO funcionarioDTO) {
         Funcionario funcionario = Funcionario.builder()
+                .Id(funcionarioDTO.id())
                 .nome(funcionarioDTO.nome())
                 .roles(funcionarioDTO.roles())
                 .build();
@@ -63,8 +64,8 @@ public class FuncionarioController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<FuncionarioDTO>> listarFuncionarios(@PathParam("nome") String nome) {
-        var funcionarios = funcionarioService.listarFuncionarios();
+    public ResponseEntity<List<FuncionarioDTO>> listarFuncionarios(@RequestParam("nome") String nome) {
+        var funcionarios = funcionarioService.listarFuncionarios(nome);
 
         return ResponseEntity.ok(funcionarios);
     }
