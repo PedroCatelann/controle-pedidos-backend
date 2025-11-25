@@ -44,6 +44,10 @@ public class FuncionarioService {
         funcionarioRepository.delete(funcionario);
     }
 
+    public Funcionario findFuncById(BigInteger id) {
+        return funcionarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado!"));
+    }
+
     public List<FuncionarioDTO> listarFuncionarios(String nome) {
         var funcionarios = funcionarioRepository.findByNomeContainingIgnoreCaseOptional(nome);
 
