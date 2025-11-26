@@ -6,6 +6,7 @@ import com.pedrocatelan.form.entities.Pedido;
 import com.pedrocatelan.form.services.FuncionarioService;
 import com.pedrocatelan.form.services.PedidoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,11 +47,11 @@ public class PedidosController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<PedidoDTO>> listarPedidos(@RequestParam("nomeCliente") String nomeCliente, @RequestParam("funcionario") String funcionario_id,
+    public ResponseEntity<List<PedidoDTO>> listarPedidos(@Param("nomeCliente") String nomeCliente, @Param("funcionario") String funcionario,
                                                          @RequestParam("dataPedido") String dataPedido) {
 
 
-        var func = funcionarioService.findFuncById(new BigInteger(funcionario_id));
+        var func = funcionarioService.findFuncById(new BigInteger(funcionario));
 
         var pedido = PedidoDTO.builder()
                 .nomeCliente(nomeCliente)
@@ -59,5 +60,11 @@ public class PedidosController {
 
         var pedidos = pedidoService.listarPedido(pedido);
         return ResponseEntity.ok(pedidos);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> alterarStatusEntregue(@PathVariable("id") BigInteger id) {
+        pedidoService.alterarStatusEntregue(id);
+        return ResponseEntity.noContent().build();
     }
 }

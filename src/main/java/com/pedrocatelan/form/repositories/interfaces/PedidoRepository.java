@@ -3,7 +3,9 @@ package com.pedrocatelan.form.repositories.interfaces;
 import com.pedrocatelan.form.dtos.PedidoDTO;
 import com.pedrocatelan.form.entities.Funcionario;
 import com.pedrocatelan.form.entities.Pedido;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -47,4 +49,15 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
             @Param("nomeCliente") String nomeCliente,
             @Param("funcionarioId") BigInteger funcionarioId,
             @Param("dataPedido") String dataPedido);
+
+    @Modifying // Sem usar Modifying o Spring iria entender que a query é um select. Ele é necessário para queries no Spring Data JPA
+    @Transactional // Garante que a operação seja executada dentro de uma transação do banco de dados.
+    @Query(
+            value = """
+            UPDATE pedido
+            SET is_entregue = CASE WHEN is_entregue = 1 THEN 0 ELSE 1 END WHERE id = :id
+            """,
+            nativeQuery = true
+    )
+    void alterarStatusEntregue(@Param("id") BigInteger id);
 }

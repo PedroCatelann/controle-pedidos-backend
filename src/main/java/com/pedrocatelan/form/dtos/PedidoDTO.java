@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record PedidoDTO(
+                        BigInteger id,
                         String telefone,
                         String bairro,
                         String rua,
@@ -19,6 +20,7 @@ public record PedidoDTO(
                         String nomeCliente,
                         Funcionario funcionario,
                         BigInteger funcionario_id,
-                        String dataPedido
+                        String dataPedido,
+                        boolean isEntregue
                         ) {
 }

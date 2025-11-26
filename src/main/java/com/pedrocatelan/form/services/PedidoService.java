@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +32,7 @@ public class PedidoService {
 
         return pedidos.stream()
                 .map(ped -> PedidoDTO.builder()
+                        .id(ped.getId())
                         .nomeCliente(ped.getNomeCliente())
                         .funcionario(ped.getFuncionario())
                         .dataPedido(ped.getDataPedido())
@@ -40,7 +42,12 @@ public class PedidoService {
                         .numero(ped.getNumero())
                         .complemento(ped.getComplemento())
                         .observacao(ped.getObservacao())
+                        .isEntregue(ped.isEntregue())
                         .build())
                 .toList();
+    }
+
+    public void alterarStatusEntregue(BigInteger id) {
+        pedidoRepository.alterarStatusEntregue(id);
     }
 }

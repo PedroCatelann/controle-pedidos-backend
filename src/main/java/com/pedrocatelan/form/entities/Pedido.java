@@ -44,4 +44,6 @@ public class Pedido {
     private LocalDateTime dataHoraInclui;
     @Column(name = "data_pedido")
     private String dataPedido;
+    @Column(name = "is_entregue")
+    private boolean isEntregue;
 }
