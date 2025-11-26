@@ -1,5 +1,6 @@
 package com.pedrocatelan.form.dtos;
 
+import com.pedrocatelan.form.entities.Funcionario;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,8 @@ public record PedidoDTO(
                         String complemento,
                         String observacao,
                         String nomeCliente,
-                        BigInteger funcionario,
+                        Funcionario funcionario,
+                        BigInteger funcionario_id,
                         String dataPedido
                         ) {
 }

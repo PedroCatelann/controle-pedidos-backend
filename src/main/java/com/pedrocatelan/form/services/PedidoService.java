@@ -27,13 +27,20 @@ public class PedidoService {
 
     public List<PedidoDTO> listarPedido(PedidoDTO pedidoDTO) {
         var pedidos = pedidoRepository.filtrar(pedidoDTO.nomeCliente(),
-            pedidoDTO.funcionario(), pedidoDTO.dataPedido().split("T")[0]);
+            pedidoDTO.funcionario().getId(), pedidoDTO.dataPedido().split("T")[0]);
 
         return pedidos.stream()
                 .map(ped -> PedidoDTO.builder()
                         .nomeCliente(ped.getNomeCliente())
-                        .funcionario(ped.getFuncionario().getId())
-                        .dataPedido(ped.getDataPedido()).build())
+                        .funcionario(ped.getFuncionario())
+                        .dataPedido(ped.getDataPedido())
+                        .telefone(ped.getTelefone())
+                        .bairro(ped.getBairro())
+                        .rua(ped.getRua())
+                        .numero(ped.getNumero())
+                        .complemento(ped.getComplemento())
+                        .observacao(ped.getObservacao())
+                        .build())
                 .toList();
     }
 }

@@ -25,7 +25,7 @@ public class PedidosController {
     @PostMapping
     public ResponseEntity salvarPedido (@RequestBody PedidoDTO order) {
 
-        var funcionario = funcionarioService.findFuncById(order.funcionario());
+        var funcionario = funcionarioService.findFuncById(order.funcionario_id());
 
 
         Pedido pedido = Pedido.builder()
@@ -46,13 +46,15 @@ public class PedidosController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<PedidoDTO>> listarPedidos(@RequestParam("nomeCliente") String nomeCliente, @RequestParam("funcionario") String funcionario,
+    public ResponseEntity<List<PedidoDTO>> listarPedidos(@RequestParam("nomeCliente") String nomeCliente, @RequestParam("funcionario") String funcionario_id,
                                                          @RequestParam("dataPedido") String dataPedido) {
 
 
+        var func = funcionarioService.findFuncById(new BigInteger(funcionario_id));
+
         var pedido = PedidoDTO.builder()
                 .nomeCliente(nomeCliente)
-                .funcionario(new BigInteger(funcionario))
+                .funcionario(func)
                 .dataPedido(dataPedido).build();
 
         var pedidos = pedidoService.listarPedido(pedido);
