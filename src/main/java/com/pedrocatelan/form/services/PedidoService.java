@@ -3,6 +3,9 @@ package com.pedrocatelan.form.services;
 import com.pedrocatelan.form.dtos.FuncionarioDTO;
 import com.pedrocatelan.form.dtos.PedidoDTO;
 import com.pedrocatelan.form.entities.Pedido;
+import com.pedrocatelan.form.exceptions.RequiredObjectIsNullException;
+import com.pedrocatelan.form.exceptions.ResourceNotFoundException;
+import com.pedrocatelan.form.repositories.interfaces.FuncionarioRepository;
 import com.pedrocatelan.form.repositories.interfaces.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import java.util.List;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final FuncionarioService funcionarioService;
 
     @Transactional //mantém a integridade dos dados, evita que modificações parciais sejam salvas em caso de falhas. Exemplo:
                    //uma transferência bancária que envolve debitar uma conta e creditar outra, @Transactional garante que ambas as operações sejam bem-sucedidas ou que nenhuma delas seja efetivada.
@@ -49,5 +53,33 @@ public class PedidoService {
 
     public void alterarStatusEntregue(BigInteger id) {
         pedidoRepository.alterarStatusEntregue(id);
+    }
+
+    public PedidoDTO obterPedido(BigInteger id) {
+        var pedido = pedidoRepository.findById(id).orElseThrow(() ->new ResourceNotFoundException("Pedido não encontrado"));
+        var funcionario = funcionarioService.findFuncById(pedido.getFuncionario().getId());
+
+        return PedidoDTO.builder()
+                .id(pedido.getId())
+                .telefone(pedido.getTelefone())
+                .bairro(pedido.getBairro())
+                .rua(pedido.getRua())
+                .numero(pedido.getNumero())
+                .complemento(pedido.getComplemento())
+                .observacao(pedido.getObservacao())
+                .nomeCliente(pedido.getNomeCliente())
+                .funcionario(funcionario)
+                .dataPedido(pedido.getDataPedido())
+                .isEntregue(pedido.isEntregue())
+                .build();
+
+    }
+    @Transactional
+    public void alterarPedido(Pedido pedido) {
+        if(pedido == null) throw new RequiredObjectIsNullException();
+
+        pedidoRepository.findById(pedido.getId()).orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado"));
+        pedidoRepository.alterarPedido(pedido.getBairro(), pedido.getComplemento(), pedido.getNomeCliente(), pedido.getNumero(), pedido.getObservacao(), pedido.getRua(), pedido.getTelefone(),
+                pedido.getFuncionario().getId(), pedido.getId());
     }
 }

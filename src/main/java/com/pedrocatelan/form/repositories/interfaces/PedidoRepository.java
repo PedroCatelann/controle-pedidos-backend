@@ -60,4 +60,31 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
             nativeQuery = true
     )
     void alterarStatusEntregue(@Param("id") BigInteger id);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            update pedido 
+            set bairro = :bairro,
+            complemento = :complemento,
+            nome_cliente = :nomeCliente,
+            numero = :numero,
+            observacao = :observacao,
+            rua = :rua,
+            telefone = :telefone,
+            funcionario_id = :funcionarioId
+            where id = :id
+            """,
+            nativeQuery = true
+    )
+    void alterarPedido(@Param("bairro") String bairro,
+                       @Param("complemento") String complemento,
+                       @Param("nomeCliente") String nomeCliente,
+                       @Param("numero") String numero,
+                       @Param("observacao") String observacao,
+                       @Param("rua") String rua,
+                       @Param("telefone") String telefone,
+                       @Param("funcionarioId") BigInteger funcionarioId,
+                       @Param("id") BigInteger id
+                       );
 }

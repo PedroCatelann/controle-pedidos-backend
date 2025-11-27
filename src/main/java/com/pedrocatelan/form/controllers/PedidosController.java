@@ -46,6 +46,31 @@ public class PedidosController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoDTO> obterPedido(@PathVariable("id") BigInteger id) {
+        return ResponseEntity.ok(pedidoService.obterPedido(id));
+    }
+
+    @PutMapping()
+    public ResponseEntity<PedidoDTO> alterarPedido(@RequestBody PedidoDTO pedidoDTO) {
+        var funcionario = funcionarioService.findFuncById(pedidoDTO.funcionario_id());
+
+        var pedido = Pedido.builder()
+                .Id(pedidoDTO.id())
+                .telefone(pedidoDTO.telefone())
+                .bairro(pedidoDTO.bairro())
+                .rua(pedidoDTO.rua())
+                .numero(pedidoDTO.numero())
+                .complemento(pedidoDTO.complemento())
+                .observacao(pedidoDTO.observacao())
+                .nomeCliente(pedidoDTO.nomeCliente())
+                .funcionario(funcionario)
+                .build();
+
+        pedidoService.alterarPedido(pedido);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/listar")
     public ResponseEntity<List<PedidoDTO>> listarPedidos(@Param("nomeCliente") String nomeCliente, @Param("funcionario") String funcionario,
                                                          @RequestParam("dataPedido") String dataPedido) {
