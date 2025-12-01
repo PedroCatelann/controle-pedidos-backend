@@ -47,6 +47,7 @@ public class PedidoService {
                         .complemento(ped.getComplemento())
                         .observacao(ped.getObservacao())
                         .isEntregue(ped.isEntregue())
+                        .dataHoraInclui(ped.getDataHoraInclui())
                         .build())
                 .toList();
     }
@@ -80,6 +81,6 @@ public class PedidoService {
 
         pedidoRepository.findById(pedido.getId()).orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado"));
         pedidoRepository.alterarPedido(pedido.getBairro(), pedido.getComplemento(), pedido.getNomeCliente(), pedido.getNumero(), pedido.getObservacao(), pedido.getRua(), pedido.getTelefone(),
-                pedido.getFuncionario().getId(), pedido.getId());
+                pedido.getFuncionario().getId(), pedido.getDataHoraAltera(), pedido.getId());
     }
 }

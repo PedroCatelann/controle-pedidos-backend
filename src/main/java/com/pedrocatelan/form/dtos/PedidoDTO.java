@@ -21,6 +21,7 @@ public record PedidoDTO(
                         Funcionario funcionario,
                         BigInteger funcionario_id,
                         String dataPedido,
+                        LocalDateTime dataHoraInclui,
                         boolean isEntregue
                         ) {
 }

@@ -38,6 +38,7 @@ public class PedidosController {
                 .observacao(order.observacao())
                 .dataPedido(LocalDate.now().toString())
                 .dataHoraInclui(LocalDateTime.now())
+                .dataHoraAltera(LocalDateTime.now())
                 .funcionario(funcionario)
                 .nomeCliente(order.nomeCliente())
                 .build();
@@ -64,6 +65,7 @@ public class PedidosController {
                 .complemento(pedidoDTO.complemento())
                 .observacao(pedidoDTO.observacao())
                 .nomeCliente(pedidoDTO.nomeCliente())
+                .dataHoraAltera(LocalDateTime.now())
                 .funcionario(funcionario)
                 .build();
 
@@ -75,8 +77,10 @@ public class PedidosController {
     public ResponseEntity<List<PedidoDTO>> listarPedidos(@Param("nomeCliente") String nomeCliente, @Param("funcionario") String funcionario,
                                                          @RequestParam("dataPedido") String dataPedido) {
 
+        Funcionario func = new Funcionario();
 
-        var func = funcionarioService.findFuncById(new BigInteger(funcionario));
+        if(!funcionario.isEmpty())
+            func = funcionarioService.findFuncById(new BigInteger(funcionario));
 
         var pedido = PedidoDTO.builder()
                 .nomeCliente(nomeCliente)

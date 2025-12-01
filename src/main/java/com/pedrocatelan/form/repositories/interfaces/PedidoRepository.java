@@ -55,7 +55,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
     @Query(
             value = """
             UPDATE pedido
-            SET is_entregue = CASE WHEN is_entregue = 1 THEN 0 ELSE 1 END WHERE id = :id
+            SET is_entregue = CASE WHEN is_entregue = 1 THEN 0 ELSE 1 END, dataentregue = GETDATE() WHERE id = :id            
             """,
             nativeQuery = true
     )
@@ -72,7 +72,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
             observacao = :observacao,
             rua = :rua,
             telefone = :telefone,
-            funcionario_id = :funcionarioId
+            funcionario_id = :funcionarioId,
+            datahoraaltera = :dataHoraAltera
             where id = :id
             """,
             nativeQuery = true
@@ -85,6 +86,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
                        @Param("rua") String rua,
                        @Param("telefone") String telefone,
                        @Param("funcionarioId") BigInteger funcionarioId,
+                       @Param("dataHoraAltera") LocalDateTime dataHoraAltera,
                        @Param("id") BigInteger id
                        );
 }
