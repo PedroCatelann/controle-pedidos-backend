@@ -1,22 +1,24 @@
 package com.pedrocatelan.form.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class User implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,6 +67,9 @@ public class User implements UserDetails, Serializable {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.permissions;
+        return permissions.stream()
+                .filter(Objects::nonNull)
+                .map(p -> new SimpleGrantedAuthority("ROLE_" + p.getDescription()))
+                .toList();
     }
 }

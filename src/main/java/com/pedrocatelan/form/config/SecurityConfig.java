@@ -64,9 +64,11 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/auth/signin",
                                         "/auth/refresh/**",
+
                                         "/swagger-ui/**",
                                         "/v3/api-docs"
                                 ).permitAll() // permite as urls listadas anteriormente
+                                .requestMatchers("/auth/createUser").hasRole("ADMIN")
                                 .requestMatchers("/funcionarios/**").authenticated() // demais endpoints da api só são acessados seo usuário estiver logado
                                 .requestMatchers("/pedidos/**").authenticated()
                                 .requestMatchers("/users").denyAll() // remove as permissões desse endpoint do Spring JPA (dependendo de como estiver configurado

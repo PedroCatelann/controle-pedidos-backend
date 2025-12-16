@@ -1,6 +1,8 @@
 package com.pedrocatelan.form.controllers;
 
 import com.pedrocatelan.form.dtos.AccountCredentialsDTO;
+import com.pedrocatelan.form.dtos.FuncionarioDTO;
+import com.pedrocatelan.form.entities.Funcionario;
 import com.pedrocatelan.form.services.AuthService;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,12 @@ public class AuthController {
         if(token == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
 
         return ResponseEntity.ok().body(token);
+    }
+
+    @PostMapping(value = "/createUser")
+    public ResponseEntity<AccountCredentialsDTO> salvarUsuario (@RequestBody AccountCredentialsDTO accountCredentialsDTO) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(service.create(accountCredentialsDTO));
     }
 
     private boolean parametersAreInvalid(String username, String refreshToken) {
