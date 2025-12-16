@@ -67,7 +67,8 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs"
                                 ).permitAll() // permite as urls listadas anteriormente
-                                .requestMatchers("/api/**").authenticated() // demais endpoints da api só são acessados seo usuário estiver logado
+                                .requestMatchers("/funcionarios/**").authenticated() // demais endpoints da api só são acessados seo usuário estiver logado
+                                .requestMatchers("/pedidos/**").authenticated()
                                 .requestMatchers("/users").denyAll() // remove as permissões desse endpoint do Spring JPA (dependendo de como estiver configurado
                 )
                 .cors(cors -> {})

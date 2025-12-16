@@ -23,6 +23,8 @@ public class AuthService {
     private UserRepository userRepository;
 
     public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentialsDTO) {
+        System.out.println("Username: " + credentialsDTO.getUsername());
+        System.out.println("Password: " + credentialsDTO.getPassword());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(credentialsDTO.getUsername(), credentialsDTO.getPassword())
         );

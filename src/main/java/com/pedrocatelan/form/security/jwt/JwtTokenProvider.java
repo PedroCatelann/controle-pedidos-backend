@@ -109,7 +109,7 @@ public class JwtTokenProvider {
     }
 
     private static boolean refreshTokenContainsBearer(String refreshToken) {
-        return !refreshToken.isBlank() && refreshToken.startsWith("Bearer ");
+        return refreshToken != null && !refreshToken.isBlank() && refreshToken.startsWith("Bearer ");
     }
 
     public boolean validateToken(String token) {
