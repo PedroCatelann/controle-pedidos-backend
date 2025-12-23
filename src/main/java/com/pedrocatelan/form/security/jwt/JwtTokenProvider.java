@@ -48,17 +48,17 @@ public class JwtTokenProvider {
         return new TokenDTO(username, true, now, validity, accessToken, refreshToken);
     }
 
-    public String refreshAccessToken(String refreshToken) {
-        DecodedJWT decodedJWT = decodedToken(refreshToken);
+    public TokenDTO refreshToken(String refreshToken) {
 
-        if (decodedJWT.getExpiresAt().before(new Date())) {
-            throw new InvalidJwtAuthenticationException("Refresh token expired");
-        }
+        if(refreshTokenContainsBearer(refreshToken)) refreshToken.substring("Bearer ".length());
+
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(refreshToken);
 
         String username = decodedJWT.getSubject();
         List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
 
-        return generateAccessToken(username, roles);
+        return createAccessToken(username, roles);
     }
 
 
@@ -123,23 +123,4 @@ public class JwtTokenProvider {
 
     }
 
-    public String extractUsername(String token) {
-        DecodedJWT decodedJWT = decodedToken(token);
-        return decodedJWT.getSubject();
-    }
-
-    public boolean isRefreshTokenValid(String token) {
-        try {
-            DecodedJWT decodedJWT = decodedToken(token);
-            return !decodedJWT.getExpiresAt().before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public String generateAccessToken(String username, List<String> roles) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
-        return getAccessToken(username, roles, now, validity);
-    }
 }

@@ -30,7 +30,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public TokenDTO signIn(AccountCredentialsDTO credentialsDTO) {
+    public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentialsDTO) {
         System.out.println("Username: " + credentialsDTO.getUsername());
         System.out.println("Password: " + credentialsDTO.getPassword());
         authenticationManager.authenticate(
@@ -42,7 +42,9 @@ public class AuthService {
             throw new UsernameNotFoundException("Username" + credentialsDTO.getUsername() + "not found!");
         }
 
-        return jwtTokenProvider.createAccessToken(credentialsDTO.getUsername(), user.getRoles());
+        var tokenResponse = jwtTokenProvider.createAccessToken(credentialsDTO.getUsername(), user.getRoles());
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     public AccountCredentialsDTO create (AccountCredentialsDTO accountCredentialsDTO) {
