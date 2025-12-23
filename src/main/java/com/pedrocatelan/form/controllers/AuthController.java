@@ -3,12 +3,21 @@ package com.pedrocatelan.form.controllers;
 import com.pedrocatelan.form.dtos.AccountCredentialsDTO;
 import com.pedrocatelan.form.dtos.FuncionarioDTO;
 import com.pedrocatelan.form.entities.Funcionario;
+import com.pedrocatelan.form.security.jwt.JwtTokenProvider;
 import com.pedrocatelan.form.services.AuthService;
 import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,32 +26,73 @@ public class AuthController {
     @Autowired
     AuthService service;
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody AccountCredentialsDTO credentialsDTO) {
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
-        if(credentialValidation(credentialsDTO)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+    @PostMapping("/signin")
+    public ResponseEntity<?> signin(@RequestBody AccountCredentialsDTO credentialsDTO,
+                                    HttpServletResponse response) {
+
+        if (credentialValidation(credentialsDTO)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Invalid client request!");
+        }
 
         var token = service.signIn(credentialsDTO);
 
-        if(token == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Invalid client request!");
+        }
 
-        return ResponseEntity.ok().body(token);
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", token.getAccessToken())
+                .httpOnly(true)
+                .secure(false) // true em produção (HTTPS)
+                .path("/")
+                .maxAge(60 * 60) // 1 hora
+                .sameSite("Lax")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", token.getRefreshToken())
+                .httpOnly(true)
+                .secure(false) // true em produção
+                .path("/auth/refresh")
+                .maxAge(60 * 60 * 24 * 3) // 3 dias
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        // 🔐 NÃO retornar tokens no body
+        return ResponseEntity.ok().body(Map.of(
+                "authenticated", true,
+                "username", token.getUsername()
+        ));
     }
 
     private static boolean credentialValidation(AccountCredentialsDTO credentialsDTO) {
         return credentialsDTO == null || StringUtils.isBlank(credentialsDTO.getPassword()) || StringUtils.isBlank(credentialsDTO.getUsername());
     }
 
-    @PutMapping("/refresh/{username}") // Como é atualização de token, podemos usar o PUT
-    public ResponseEntity<?> refreshToken(@PathVariable("username") String username, @RequestHeader("Authorization") String refreshToken) {
+    @PutMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request,
+                                     HttpServletResponse response) {
 
-        if(parametersAreInvalid(username, refreshToken)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+        Cookie refreshCookie = WebUtils.getCookie(request, "refreshToken");
 
-        var token = service.refreshToken(username, refreshToken);
 
-        if(token == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+        String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshCookie.getValue());
 
-        return ResponseEntity.ok().body(token);
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(3600)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/createUser")
