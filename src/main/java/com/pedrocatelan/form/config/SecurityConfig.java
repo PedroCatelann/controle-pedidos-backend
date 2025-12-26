@@ -2,6 +2,7 @@ package com.pedrocatelan.form.config;
 
 import com.pedrocatelan.form.security.jwt.JwtTokenFilter;
 import com.pedrocatelan.form.security.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,6 +73,14 @@ public class SecurityConfig {
                                 .requestMatchers("/funcionarios/**").authenticated() // demais endpoints da api só são acessados seo usuário estiver logado
                                 .requestMatchers("/pedidos/**").authenticated()
                                 .requestMatchers("/users").denyAll() // remove as permissões desse endpoint do Spring JPA (dependendo de como estiver configurado
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+                        })
                 )
                 .cors(cors -> {})
                 .build();

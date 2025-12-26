@@ -37,7 +37,7 @@ public class AuthController {
         return credentialsDTO == null || StringUtils.isBlank(credentialsDTO.getPassword()) || StringUtils.isBlank(credentialsDTO.getUsername());
     }
 
-    @PutMapping("/refresh") // Como é atualização de token, podemos usar o PUT
+    @PutMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authorizationHeader) {
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {

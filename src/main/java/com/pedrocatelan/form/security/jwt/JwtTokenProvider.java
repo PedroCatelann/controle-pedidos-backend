@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pedrocatelan.form.dtos.TokenDTO;
+import com.pedrocatelan.form.exceptions.ExpiredTokenException;
 import com.pedrocatelan.form.exceptions.InvalidJwtAuthenticationException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -113,11 +114,11 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
-        DecodedJWT decodedJWT = decodedToken(token);
         try {
+            DecodedJWT decodedJWT = decodedToken(token);
             return !decodedJWT.getExpiresAt().before(new Date());
         } catch (Exception e) {
-            throw new InvalidJwtAuthenticationException("Expired or Invalid JWT Token");
+            return false;
         }
 
 
