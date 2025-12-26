@@ -55,7 +55,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
     @Query(
             value = """
             UPDATE pedido
-            SET is_entregue = CASE WHEN is_entregue = 1 THEN 0 ELSE 1 END, dataentregue = GETDATE() WHERE id = :id            
+            SET is_entregue = CASE WHEN is_entregue = 1 THEN 0 ELSE 1 END, datahoraentregue = GETDATE() WHERE id = :id            
             """,
             nativeQuery = true
     )
@@ -89,4 +89,39 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
                        @Param("dataHoraAltera") LocalDateTime dataHoraAltera,
                        @Param("id") BigInteger id
                        );
+
+    @Query(
+            value = """
+    SELECT *
+    FROM PEDIDO p
+    WHERE 
+        -- filtro por nome (opcional)
+        (
+            :nomeCliente IS NULL 
+            OR :nomeCliente = '' 
+            OR LOWER(p.nome_cliente) LIKE LOWER(CONCAT('%', :nomeCliente, '%'))
+        )
+
+        -- filtro por funcionário (opcional)
+        AND (
+            :funcionarioId IS NULL
+            OR p.funcionario_id = :funcionarioId
+        )
+
+        -- filtro por data início (opcional)
+        AND (
+            :dataPedido IS NULL
+            OR p.data_pedido >= :dataPedido
+        )        
+        
+        AND p.is_entregue = 1
+
+    ORDER BY p.datahorainclui DESC
+  """,
+            nativeQuery = true
+    )
+    List<Pedido> filtrarPedidoEntregue(
+            @Param("nomeCliente") String nomeCliente,
+            @Param("funcionarioId") BigInteger funcionarioId,
+            @Param("dataPedido") String dataPedido);
 }

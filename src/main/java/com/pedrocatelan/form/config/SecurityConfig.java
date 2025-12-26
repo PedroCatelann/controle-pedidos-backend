@@ -76,7 +76,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"); // ajuste para quando o token tiver expirado retornar 401
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");

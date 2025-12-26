@@ -96,4 +96,22 @@ public class PedidosController {
         pedidoService.alterarStatusEntregue(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/listarPedidosEntregues")
+    public ResponseEntity<List<PedidoDTO>> listarPedidosEntregues(@Param("nomeCliente") String nomeCliente, @Param("funcionario") String funcionario,
+                                                         @RequestParam("dataPedido") String dataPedido) {
+
+        Funcionario func = new Funcionario();
+
+        if(!funcionario.isEmpty())
+            func = funcionarioService.findFuncById(new BigInteger(funcionario));
+
+        var pedido = PedidoDTO.builder()
+                .nomeCliente(nomeCliente)
+                .funcionario(func)
+                .dataPedido(dataPedido).build();
+
+        var pedidos = pedidoService.listarPedidoEntregue(pedido);
+        return ResponseEntity.ok(pedidos);
+    }
 }

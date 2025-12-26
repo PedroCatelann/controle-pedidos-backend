@@ -52,6 +52,29 @@ public class PedidoService {
                 .toList();
     }
 
+    public List<PedidoDTO> listarPedidoEntregue(PedidoDTO pedidoDTO) {
+        var pedidos = pedidoRepository.filtrarPedidoEntregue(pedidoDTO.nomeCliente(),
+                pedidoDTO.funcionario().getId(), pedidoDTO.dataPedido().split("T")[0]);
+
+        return pedidos.stream()
+                .map(ped -> PedidoDTO.builder()
+                        .id(ped.getId())
+                        .nomeCliente(ped.getNomeCliente())
+                        .funcionario(ped.getFuncionario())
+                        .dataPedido(ped.getDataPedido())
+                        .telefone(ped.getTelefone())
+                        .bairro(ped.getBairro())
+                        .rua(ped.getRua())
+                        .numero(ped.getNumero())
+                        .complemento(ped.getComplemento())
+                        .observacao(ped.getObservacao())
+                        .isEntregue(ped.isEntregue())
+                        .dataHoraInclui(ped.getDataHoraInclui())
+                        .dataHoraEntregue(ped.getDataHoraEntregue())
+                        .build())
+                .toList();
+    }
+
     public void alterarStatusEntregue(BigInteger id) {
         pedidoRepository.alterarStatusEntregue(id);
     }

@@ -44,10 +44,10 @@ public class Pedido {
     private LocalDateTime dataHoraInclui;
     @Column(name = "datahoraaltera")
     private LocalDateTime dataHoraAltera;
-    @Column(name = "dataentregue")
-    private LocalDateTime dataEntregue;
     @Column(name = "data_pedido")
     private String dataPedido;
     @Column(name = "is_entregue")
     private boolean isEntregue;
+    @Column(name = "datahoraentregue")
+    private LocalDateTime dataHoraEntregue;
 }
