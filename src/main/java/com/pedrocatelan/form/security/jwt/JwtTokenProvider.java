@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,9 @@ public class JwtTokenProvider {
 
     public TokenDTO refreshToken(String refreshToken) {
 
-        if(refreshTokenContainsBearer(refreshToken)) refreshToken.substring("Bearer ".length());
+        if (refreshTokenContainsBearer(refreshToken)) {
+            refreshToken = refreshToken.substring("Bearer ".length());
+        }
 
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
@@ -87,11 +90,27 @@ public class JwtTokenProvider {
                 .sign(algorithm);
     }
 
+//    public Authentication getAuthentication(String token) {
+//        DecodedJWT decodedJWT = decodedToken(token);
+//        UserDetails userDetails = this.userDetailsService.loadUserByUsername(decodedJWT.getSubject());
+//        var a = userDetails.getAuthorities();
+//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+//    }
+
     public Authentication getAuthentication(String token) {
         DecodedJWT decodedJWT = decodedToken(token);
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(decodedJWT.getSubject());
-        var a = userDetails.getAuthorities();
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+
+        List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+
+        var authorities = roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
+        return new UsernamePasswordAuthenticationToken(
+                decodedJWT.getSubject(), // username
+                null,
+                authorities
+        );
     }
 
     private DecodedJWT decodedToken(String token) {

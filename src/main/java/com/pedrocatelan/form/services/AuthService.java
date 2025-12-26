@@ -17,7 +17,10 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class AuthService {
@@ -31,20 +34,33 @@ public class AuthService {
     private UserRepository userRepository;
 
     public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentialsDTO) {
-        System.out.println("Username: " + credentialsDTO.getUsername());
-        System.out.println("Password: " + credentialsDTO.getPassword());
+
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(credentialsDTO.getUsername(), credentialsDTO.getPassword())
+                new UsernamePasswordAuthenticationToken(
+                        credentialsDTO.getUsername(),
+                        credentialsDTO.getPassword()
+                )
         );
 
         var user = userRepository.findByUsername(credentialsDTO.getUsername());
-        if(user == null) {
-            throw new UsernameNotFoundException("Username" + credentialsDTO.getUsername() + "not found!");
+        if (user == null) {
+            throw new UsernameNotFoundException(
+                    "Username " + credentialsDTO.getUsername() + " not found!"
+            );
         }
 
-        var tokenResponse = jwtTokenProvider.createAccessToken(credentialsDTO.getUsername(), user.getRoles());
+        // 🔥 CONVERSÃO CORRETA
+        List<String> roles = user.getPermissions()
+                .stream()
+                .map(role -> "ROLE_" + role.getDescription())
+                .toList();// 👈 FUNDAMENTAL
 
-        return ResponseEntity.ok(tokenResponse);
+        return ResponseEntity.ok(
+                jwtTokenProvider.createAccessToken(
+                        user.getUsername(),
+                        roles
+                )
+        );
     }
 
     public AccountCredentialsDTO create (AccountCredentialsDTO accountCredentialsDTO) {
