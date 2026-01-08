@@ -129,7 +129,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
 
 
     @Query("SELECT p FROM Pedido p WHERE p.funcionario.id = :idFuncionario " +
-            "AND p.dataPedido BETWEEN :primeiroDia AND :ultimoDia AND p.isEntregue = true")
+            "AND p.dataHoraPassouEntrega BETWEEN :primeiroDia AND :ultimoDia AND p.isEntregue = true")
     List<Pedido> buscarPedidoPorFuncionarioAnoMes(@Param("idFuncionario") String idFuncionario,
                                                   @Param("primeiroDia") String primeiroDia,
                                                   @Param("ultimoDia") String ultimoDia);
@@ -146,4 +146,15 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
     List<PedidoPorDiaDTO> buscarQuantidadePedidosPorDiaPorFuncionarioAnoMesAgrupado(@Param("idFuncionario") String idFuncionario,
                                                                                     @Param("primeiroDia") String primeiroDia,
                                                                                     @Param("ultimoDia") String ultimoDia);
+
+    @Modifying // Sem usar Modifying o Spring iria entender que a query é um select. Ele é necessário para queries no Spring Data JPA
+    @Transactional // Garante que a operação seja executada dentro de uma transação do banco de dados.
+    @Query(
+            value = """
+            UPDATE pedido
+            SET datahorapassouentrega = GETDATE(), passou_entrega = 1 WHERE id = :id            
+            """,
+            nativeQuery = true
+    )
+    void passouEntrega(@Param("id") BigInteger id);
 }

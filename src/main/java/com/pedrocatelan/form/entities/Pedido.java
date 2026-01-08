@@ -50,4 +50,8 @@ public class Pedido {
     private boolean isEntregue;
     @Column(name = "datahoraentregue")
     private LocalDateTime dataHoraEntregue;
+    @Column(name = "datahorapassouentrega")
+    private LocalDateTime dataHoraPassouEntrega;
+    @Column(name = "passou_entrega")
+    private boolean passouEntrega;
 }

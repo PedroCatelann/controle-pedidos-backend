@@ -23,6 +23,7 @@ public record PedidoDTO(
                         String dataPedido,
                         LocalDateTime dataHoraInclui,
                         boolean isEntregue,
-                        LocalDateTime dataHoraEntregue
+                        LocalDateTime dataHoraEntregue,
+                        boolean passouEntregador
                         ) {
 }

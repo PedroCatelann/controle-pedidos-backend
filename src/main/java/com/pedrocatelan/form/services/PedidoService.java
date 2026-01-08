@@ -48,6 +48,7 @@ public class PedidoService {
                         .observacao(ped.getObservacao())
                         .isEntregue(ped.isEntregue())
                         .dataHoraInclui(ped.getDataHoraInclui())
+                        .passouEntregador(ped.isPassouEntrega())
                         .build())
                 .toList();
     }
@@ -77,6 +78,10 @@ public class PedidoService {
 
     public void alterarStatusEntregue(BigInteger id) {
         pedidoRepository.alterarStatusEntregue(id);
+    }
+
+    public void passouEntrega(BigInteger id) {
+        pedidoRepository.passouEntrega(id);
     }
 
     public PedidoDTO obterPedido(BigInteger id) {

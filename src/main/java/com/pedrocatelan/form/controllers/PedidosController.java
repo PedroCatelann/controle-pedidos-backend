@@ -97,6 +97,12 @@ public class PedidosController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/passouEntrega/{id}")
+    public ResponseEntity<Void> passouEntrega(@PathVariable("id") BigInteger id) {
+        pedidoService.passouEntrega(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/listarPedidosEntregues")
     public ResponseEntity<List<PedidoDTO>> listarPedidosEntregues(@Param("nomeCliente") String nomeCliente, @Param("funcionario") String funcionario,
                                                          @RequestParam("dataPedido") String dataPedido) {
