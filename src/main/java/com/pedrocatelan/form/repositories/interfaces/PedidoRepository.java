@@ -1,6 +1,7 @@
 package com.pedrocatelan.form.repositories.interfaces;
 
 import com.pedrocatelan.form.dtos.PedidoDTO;
+import com.pedrocatelan.form.dtos.PedidoPorDiaDTO;
 import com.pedrocatelan.form.entities.Funcionario;
 import com.pedrocatelan.form.entities.Pedido;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -124,4 +126,24 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
             @Param("nomeCliente") String nomeCliente,
             @Param("funcionarioId") BigInteger funcionarioId,
             @Param("dataPedido") String dataPedido);
+
+
+    @Query("SELECT p FROM Pedido p WHERE p.funcionario.id = :idFuncionario " +
+            "AND p.dataPedido BETWEEN :primeiroDia AND :ultimoDia AND p.isEntregue = true")
+    List<Pedido> buscarPedidoPorFuncionarioAnoMes(@Param("idFuncionario") String idFuncionario,
+                                                  @Param("primeiroDia") String primeiroDia,
+                                                  @Param("ultimoDia") String ultimoDia);
+
+    @Query("""
+        SELECT new com.pedrocatelan.form.dtos.PedidoPorDiaDTO(p.dataPedido, COUNT(p))
+        FROM Pedido p
+        WHERE p.funcionario.id = :idFuncionario
+          AND p.dataPedido BETWEEN :primeiroDia AND :ultimoDia
+          AND p.isEntregue = true
+        GROUP BY p.dataPedido
+        ORDER BY p.dataPedido
+    """)
+    List<PedidoPorDiaDTO> buscarQuantidadePedidosPorDiaPorFuncionarioAnoMesAgrupado(@Param("idFuncionario") String idFuncionario,
+                                                                                    @Param("primeiroDia") String primeiroDia,
+                                                                                    @Param("ultimoDia") String ultimoDia);
 }

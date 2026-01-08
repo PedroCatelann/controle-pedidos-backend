@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/createUser").hasRole("ADMIN")
                                 .requestMatchers("/funcionarios/**").authenticated() // demais endpoints da api só são acessados seo usuário estiver logado
                                 .requestMatchers("/pedidos/**").hasRole("ADMIN")
+                                .requestMatchers("/metricas/**").hasRole("ADMIN")
                                 .requestMatchers("/users").denyAll() // remove as permissões desse endpoint do Spring JPA (dependendo de como estiver configurado
                 )
                 .exceptionHandling(ex -> ex
