@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pedrocatelan.form.dtos.TokenDTO;
 import com.pedrocatelan.form.exceptions.ExpiredTokenException;
 import com.pedrocatelan.form.exceptions.InvalidJwtAuthenticationException;
+import com.pedrocatelan.form.repositories.interfaces.UserRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -32,6 +34,8 @@ public class JwtTokenProvider {
     private long validityInMilliseconds;
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private UserRepository userRepository;
 
     Algorithm algorithm = null;
 
@@ -41,13 +45,13 @@ public class JwtTokenProvider {
         algorithm = Algorithm.HMAC256(secretKey.getBytes());
     }
 
-    public TokenDTO createAccessToken(String username, List<String> roles) {
+    public TokenDTO createAccessToken(String username, List<String> roles, String fullname) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         String accessToken = getAccessToken(username, roles, now, validity);
         String refreshToken = getRefreshToken(username, roles, now);
-        return new TokenDTO(username, true, now, validity, accessToken, refreshToken);
+        return new TokenDTO(username, fullname, true, now, validity, accessToken, refreshToken);
     }
 
     public TokenDTO refreshToken(String refreshToken) {
@@ -62,7 +66,14 @@ public class JwtTokenProvider {
         String username = decodedJWT.getSubject();
         List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
 
-        return createAccessToken(username, roles);
+        var user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException(
+                    "Username " + username + " not found!"
+            );
+        }
+
+        return createAccessToken(username, roles, user.getFullname());
     }
 
 

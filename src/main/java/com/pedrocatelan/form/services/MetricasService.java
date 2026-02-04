@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.webresources.EmptyResource;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +41,7 @@ public class MetricasService {
         double mediaSegundos = pedidos.stream()
                 .filter(p -> p.getDataHoraEntregue() != null)
                 .mapToLong(p -> Duration.between(
-                        p.getDataHoraInclui(),
+                        p.getDataHoraPassouEntrega(),
                         p.getDataHoraEntregue()
                 ).getSeconds())
                 .average()
@@ -52,11 +50,11 @@ public class MetricasService {
         Double mediaMinutos = mediaSegundos / 60.0;
 
         Pedido pedidoMaiorTempo = pedidos.stream()
-                .filter(p -> p.getDataHoraInclui() != null)
+                .filter(p -> p.getDataHoraPassouEntrega() != null)
                 .filter(p -> p.getDataHoraEntregue() != null)
                 .max(Comparator.comparingLong(p ->
                         Duration.between(
-                                p.getDataHoraInclui(),
+                                p.getDataHoraPassouEntrega(),
                                 p.getDataHoraEntregue()
                         ).getSeconds()
                 )).orElse(null);
@@ -69,7 +67,7 @@ public class MetricasService {
             double mediaSegundosMaximo = pedidos.stream()
                     .filter(p -> p.getDataHoraEntregue() != null)
                     .mapToLong(p ->
-                            Duration.between( p.getDataHoraInclui(), p.getDataHoraEntregue()
+                            Duration.between( p.getDataHoraPassouEntrega(), p.getDataHoraEntregue()
                             ).getSeconds())
                     .max()
                     .orElse(0);

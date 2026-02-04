@@ -5,6 +5,7 @@ import com.pedrocatelan.form.dtos.PedidoPorDiaDTO;
 import com.pedrocatelan.form.entities.Funcionario;
 import com.pedrocatelan.form.entities.Pedido;
 import jakarta.transaction.Transactional;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -128,8 +129,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
             @Param("dataPedido") String dataPedido);
 
 
-    @Query("SELECT p FROM Pedido p WHERE p.funcionario.id = :idFuncionario " +
-            "AND p.dataHoraPassouEntrega BETWEEN :primeiroDia AND :ultimoDia AND p.isEntregue = true")
+    @Query("SELECT p FROM Pedido p WHERE p.funcionario.Id = :idFuncionario " +
+            "AND p.dataPedido BETWEEN :primeiroDia AND :ultimoDia AND p.isEntregue = true")
     List<Pedido> buscarPedidoPorFuncionarioAnoMes(@Param("idFuncionario") String idFuncionario,
                                                   @Param("primeiroDia") String primeiroDia,
                                                   @Param("ultimoDia") String ultimoDia);
@@ -137,7 +138,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, BigInteger> {
     @Query("""
         SELECT new com.pedrocatelan.form.dtos.PedidoPorDiaDTO(p.dataPedido, COUNT(p))
         FROM Pedido p
-        WHERE p.funcionario.id = :idFuncionario
+        WHERE p.funcionario.Id = :idFuncionario
           AND p.dataPedido BETWEEN :primeiroDia AND :ultimoDia
           AND p.isEntregue = true
         GROUP BY p.dataPedido

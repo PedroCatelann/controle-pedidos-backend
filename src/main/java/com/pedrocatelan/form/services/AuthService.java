@@ -49,7 +49,6 @@ public class AuthService {
             );
         }
 
-        // 🔥 CONVERSÃO CORRETA
         List<String> roles = user.getPermissions()
                 .stream()
                 .map(role -> "ROLE_" + role.getDescription())
@@ -58,7 +57,8 @@ public class AuthService {
         return ResponseEntity.ok(
                 jwtTokenProvider.createAccessToken(
                         user.getUsername(),
-                        roles
+                        roles,
+                        user.getFullname()
                 )
         );
     }
