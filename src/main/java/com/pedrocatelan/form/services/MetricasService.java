@@ -39,7 +39,7 @@ public class MetricasService {
         ));
 
         double mediaSegundos = pedidos.stream()
-                .filter(p -> p.getDataHoraEntregue() != null)
+                .filter(p -> p.getDataHoraEntregue() != null && p.getDataHoraPassouEntrega() != null)
                 .mapToLong(p -> Duration.between(
                         p.getDataHoraPassouEntrega(),
                         p.getDataHoraEntregue()
@@ -50,8 +50,7 @@ public class MetricasService {
         Double mediaMinutos = mediaSegundos / 60.0;
 
         Pedido pedidoMaiorTempo = pedidos.stream()
-                .filter(p -> p.getDataHoraPassouEntrega() != null)
-                .filter(p -> p.getDataHoraEntregue() != null)
+                .filter(p -> p.getDataHoraPassouEntrega() != null && p.getDataHoraEntregue() != null)
                 .max(Comparator.comparingLong(p ->
                         Duration.between(
                                 p.getDataHoraPassouEntrega(),
@@ -65,7 +64,7 @@ public class MetricasService {
             var bairro = pedidoMaiorTempo.getBairro().isBlank() ? "" : pedidoMaiorTempo.getBairro();
 
             double mediaSegundosMaximo = pedidos.stream()
-                    .filter(p -> p.getDataHoraEntregue() != null)
+                    .filter(p -> p.getDataHoraEntregue() != null && p.getDataHoraPassouEntrega() != null)
                     .mapToLong(p ->
                             Duration.between( p.getDataHoraPassouEntrega(), p.getDataHoraEntregue()
                             ).getSeconds())
