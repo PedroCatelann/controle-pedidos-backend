@@ -79,7 +79,7 @@ public class PedidosController {
 
         Funcionario func = new Funcionario();
 
-        if(!funcionario.isEmpty())
+        if(funcionario != null && !funcionario.isEmpty())
             func = funcionarioService.findFuncById(new BigInteger(funcionario));
 
         var pedido = PedidoDTO.builder()
@@ -109,7 +109,7 @@ public class PedidosController {
 
         Funcionario func = new Funcionario();
 
-        if(!funcionario.isEmpty())
+        if(funcionario != null && !funcionario.isEmpty())
             func = funcionarioService.findFuncById(new BigInteger(funcionario));
 
         var pedido = PedidoDTO.builder()
