@@ -15,3 +15,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
+
+security:
+  jwt:
+    token:
+      secret-key: 53cr37 # Pode ser qualquer valor
+      expire-length: 3600000
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace

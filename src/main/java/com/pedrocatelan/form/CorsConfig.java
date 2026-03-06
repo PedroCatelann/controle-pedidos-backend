@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Aplica as regras a todos os endpoints da sua API
                 .allowedOrigins("http://localhost:3000") // 👈 O FRONTEND (Next.js)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos permitidos
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Métodos permitidos
                 .allowedHeaders("*") // Permite todos os cabeçalhos (headers)
                 .allowCredentials(true); // Permite credenciais (cookies, tokens de autenticação)
     }

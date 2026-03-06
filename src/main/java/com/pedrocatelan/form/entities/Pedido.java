@@ -37,9 +37,21 @@ public class Pedido {
     private String complemento;
     @Column
     private String observacao;
-    @Column
+    @Column(name = "nome_cliente")
     private String nomeCliente;
     @CreatedDate
     @Column(name = "datahorainclui")
     private LocalDateTime dataHoraInclui;
+    @Column(name = "datahoraaltera")
+    private LocalDateTime dataHoraAltera;
+    @Column(name = "data_pedido")
+    private String dataPedido;
+    @Column(name = "is_entregue")
+    private boolean isEntregue;
+    @Column(name = "datahoraentregue")
+    private LocalDateTime dataHoraEntregue;
+    @Column(name = "datahorapassouentrega")
+    private LocalDateTime dataHoraPassouEntrega;
+    @Column(name = "passou_entrega")
+    private boolean passouEntrega;
 }
