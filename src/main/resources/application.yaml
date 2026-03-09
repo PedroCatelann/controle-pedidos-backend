@@ -1,3 +1,7 @@
+debug: false
+app:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
 spring:
   datasource:
     url: "jdbc:sqlserver://CATELAN\\SQLEXPRESS;databaseName=BANCO_CONSULTA;sendStringParametersAsUnicode=false;encrypt=false;"
