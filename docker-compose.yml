@@ -1,0 +1,70 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: controle-pedidos-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-TroqueEstaSenha123!}"
+      MSSQL_PID: "${MSSQL_PID:-Express}"
+      TZ: "${TZ:-America/Sao_Paulo}"
+    ports:
+      - "${SQLSERVER_PORT:-1433}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/1433'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: controle-pedidos-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-TroqueEstaSenha123!}"
+      MSSQL_DATABASE: "${MSSQL_DATABASE:-controle_pedidos}"
+    volumes:
+      - ./docker/sql/init.sql:/docker/sql/init.sql:ro
+      - ./docker/sql/init-db.sh:/docker/sql/init-db.sh:ro
+    entrypoint:
+      - /bin/sh
+      - /docker/sql/init-db.sh
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: controle-pedidos-backend:latest
+    container_name: controle-pedidos-backend
+    restart: unless-stopped
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      SERVER_PORT: "${SERVER_PORT:-8080}"
+      SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:sqlserver://sqlserver:1433;databaseName=controle_pedidos;sendStringParametersAsUnicode=false;encrypt=true;trustServerCertificate=true;}"
+      SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-sa}"
+      SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD:-TroqueEstaSenha123!}"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}"
+      SPRING_JPA_SHOW_SQL: "${SPRING_JPA_SHOW_SQL:-false}"
+      JAVA_TOOL_OPTIONS: "${JAVA_TOOL_OPTIONS:--XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0}"
+      TZ: "${TZ:-America/Sao_Paulo}"
+    networks:
+      - default
+      - controle-pedidos-network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  controle-pedidos-network:
+    name: controle-pedidos-network
+    external: true
