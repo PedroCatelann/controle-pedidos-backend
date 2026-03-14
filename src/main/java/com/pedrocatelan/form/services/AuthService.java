@@ -4,6 +4,8 @@ import com.pedrocatelan.form.dtos.AccountCredentialsDTO;
 import com.pedrocatelan.form.dtos.TokenDTO;
 import com.pedrocatelan.form.entities.User;
 import com.pedrocatelan.form.exceptions.RequiredObjectIsNullException;
+import com.pedrocatelan.form.entities.Permission;
+import com.pedrocatelan.form.repositories.interfaces.PermissionRepository;
 import com.pedrocatelan.form.repositories.interfaces.UserRepository;
 import com.pedrocatelan.form.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,9 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentialsDTO) {
 
@@ -67,6 +73,12 @@ public class AuthService {
 
         if(accountCredentialsDTO == null) throw new RequiredObjectIsNullException();
 
+        List<Permission> permissions = new ArrayList<>();
+        if (accountCredentialsDTO.getPermission() != null && !accountCredentialsDTO.getPermission().isBlank()) {
+            permissionRepository.findByDescription(accountCredentialsDTO.getPermission())
+                    .ifPresent(permissions::add);
+        }
+
         var user = User.builder()
                 .username(accountCredentialsDTO.getUsername())
                 .fullname(accountCredentialsDTO.getFullname())
@@ -75,8 +87,8 @@ public class AuthService {
                 .accountNonLocked(true)
                 .credentialsNonExpired(true)
                 .enabled(true)
+                .permissions(permissions)
                 .build();
-
 
         var savedUser = userRepository.save(user);
 
