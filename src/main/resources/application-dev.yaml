@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 debug: false
 app:
   cors:
@@ -7,7 +10,7 @@ spring:
     url: "jdbc:sqlserver://CATELAN\\SQLEXPRESS;databaseName=BANCO_CONSULTA;sendStringParametersAsUnicode=false;encrypt=false;"
     username: 'sa'
     password: '28phfktlan02'
-    driver=class-name: 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+    driver-class-name: 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
 
   jpa:
     hibernate:
@@ -25,5 +28,5 @@ security:
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    org.hibernate.SQL: trace
     org.hibernate.orm.jdbc.bind: trace
